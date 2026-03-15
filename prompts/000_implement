@@ -1,0 +1,165 @@
+This repository is a fork of crosstool-NG.
+
+
+# Objective
+
+I want some pre-built packs of GCC and others for multiple triplets.
+The packs will be built on GitHub Actions.
+
+The triplet matrix is:
+
+Host: Ubuntu 12.04, 14.04, 16.04, 18.04, 20.04, 22.04, 24.04 (all x86_64-pc-linux-gnu)
+Target: arm-unknown-linux-gnueabi, arm-unknown-linux-gnueabihf, arm-none-eabi (bare-metal, multilib)
+
+So the combinations will be 7x3 = 21 variants:
+
+- Host: Ubuntu 12.04 (x86_64-pc-linux-gnu), Target: arm-unknown-linux-gnueabi (Linux)
+- Host: Ubuntu 12.04 (x86_64-pc-linux-gnu), Target: arm-unknown-linux-gnueabihf (Linux)
+- Host: Ubuntu 12.04 (x86_64-pc-linux-gnu), Target: arm-none-eabi (bare-metal)
+- Host: Ubuntu 14.04 (x86_64-pc-linux-gnu), Target: arm-unknown-linux-gnueabi (Linux)
+- Host: Ubuntu 14.04 (x86_64-pc-linux-gnu), Target: arm-unknown-linux-gnueabihf (Linux)
+- Host: Ubuntu 14.04 (x86_64-pc-linux-gnu), Target: arm-none-eabi (bare-metal)
+...(snip)
+
+The toolchains' prefix is `/opt/x-tools/...`.
+
+Pack built toolchain into .tar.xz each and upload them to a GitHub Release's asset section.
+
+
+# Repository structure
+
+Every branches are checked-out in each directories using `git worktree`.
+
+- master: the default branch. Heavily modified from the upstream; has this prompt, readme, and a GitHub Actions workflow directory (inherited from upstream). Put everything related to GH Actions in this branch.
+- 1.22.0: points the tag `crosstool-ng-1.22.0` at this point. Add commits here up to patch 1.22.0. The upstream's code has GH Actions data, but ignore them.
+- 1.28.0: points the tag `crosstool-ng-1.28.0` at this point. Add commits here up to patch 1.28.0. The upstream's code has GH Actions data, but ignore them.
+
+
+# Configs
+
+What we're going to achieve here is to recreate toolchains that each Ubuntu LTS provided.
+To achieve that, I've made a YAML that describes the combination of version of kernel, tools, and libraries in prompt/versions.yml.
+For example, a definition for Ubuntu 24.04 is as follows:
+
+```yml
+toolchain_data:
+  ubuntu_24.04:
+    name: "Noble Numbat"
+    kernel_version: "6.8" # Current point release 24.04.1
+    gcc_version: "13.3.0"
+    glibc_version: "2.39"
+    binutils_version: "2.42"
+    gdb_version: "15.0"
+    companion_libs:
+      gmp: "6.3.0"
+      mpfr: "4.2.1"
+      mpc: "1.3.1"
+      isl: "0.26"
+```
+
+crosstool-NG's config should point exactly the same version for all software, but sometimes crosstool-NG may or may not have the exact version.
+Strategy of choosing the version is as follows:
+
+- GCC, glibc, binutils: Major version MUST be the same. Minor and patch version SHOULD be the same too, but can be equal or newer.
+- Companion libs: Major, minor, and patch version SHOULD be the same, but can be equal or newer.
+
+Basically, you should build toolchains with 1.28.0. But for very old Ubuntu like 12.04 and 14.04, the exact major version may be missing in it.
+If it's the case for arbitrary version of Ubuntu, switch to the 1.22.0 branch (checked-out directory) to match the versions.
+
+I've made two example of defconfigs after tinkering with ct-ng (ver: master) menuconfig.
+Lines I've manually edited have leading `#` and explanation.
+The default value can be very different. Always respect the default value of the based configuration.
+(Note: arm-
+
+
+defconfig (linux, based on arm-unknown-linux-gnueabi):
+
+```
+CT_CONFIG_VERSION="4"
+CT_OBSOLETE=y # Necessary for all available options
+CT_DEBUG_CT=y # Necessary to save steps
+CT_DEBUG_CT_SAVE_STEPS=y # Saves each compilation steps to continue from. CONTINUE= and STOP= is useful to do a re-build-and-error loop.
+# CT_REMOVE_DOCS is not set
+CT_STRIP_TARGET_TOOLCHAIN_EXECUTABLES=y # I don't know why it's enabled, but better to have a smaller toolchain to redistribute
+CT_ARCH_ARM=y
+CT_ARCH_FLOAT_SW=y # For armel (gnueabi), say y. for armhf (gnueabihf), say n. Mutually exclusive to CT_ARCH_FLOAT_HW.
+CT_ARCH_FLOAT_HW=y # For armel (gnueabi), say n. for armhf (gnueabihf), say y. Mutually exclusive to CT_ARCH_FLOAT_SW.
+CT_STATIC_TOOLCHAIN=y # Prefer smaller size
+CT_KERNEL_LINUX=y
+CT_LINUX_V_4_15=y # Specify the matching version to the Ubuntu LTS
+CT_BINUTILS_V_2_26=y # Specify the matching version to the Ubuntu LTS
+CT_GLIBC_V_2_23=y # Specify the matching version to the Ubuntu LTS
+CT_GLIBC_EXTRA_CFLAGS="-Wno-missing-attributes -Wno-array-bounds -Wno-array-parameter -Wno-stringop-overflow -Wno-maybe-uninitialized -Wno-implicit-int"
+CT_GLIBC_ENABLE_COMMON_FLAG=y
+CT_GCC_V_5=y # Specify the matching version to the Ubuntu LTS
+# CT_CC_GCC_SJLJ_EXCEPTIONS is not set
+CT_CC_LANG_CXX=y
+CT_DEBUG_DUMA=y
+CT_DEBUG_GDB=y
+CT_GDB_NATIVE=y
+CT_DEBUG_LTRACE=y
+CT_DEBUG_STRACE=y
+CT_GMP_V_6_1=y # Specify the matching version to the Ubuntu LTS
+CT_GMP_EXTRA_CFLAGS="-std=gnu17"
+CT_ISL_V_0_15=y # Specify the matching version to the Ubuntu LTS
+CT_NCURSES_EXTRA_CFLAGS="-std=gnu11" # GCC 5 will not understand gnu17 but gnu11
+CT_ZSTD_NEEDED=y
+```
+
+defconfig (bare-metal, based on samples/arm-none-eabi):
+Note: arm-none-eabi does not exist in 1.22.0. Start from similar sample, guess the value, and make the config as close as future versions possible. But, still use the same name "arm-none-eabi".
+
+```
+CT_CONFIG_VERSION="4"
+CT_OBSOLETE=y # Necessary to specify old deps
+CT_DEBUG_CT=y # Necessary to save steps
+CT_DEBUG_CT_SAVE_STEPS=y # Saves each compilation steps to continue from. CONTINUE= and STOP= is useful to do a re-build-and-error loop.
+CT_STRIP_TARGET_TOOLCHAIN_EXECUTABLES=y # I don't know why it's enabled, but better to have a smaller toolchain to redistribute
+CT_ARCH_ARM=y
+CT_MULTILIB=y
+CT_TARGET_CFLAGS="-ftls-model=local-exec"
+CT_STATIC_TOOLCHAIN=y # We need a portable toolchain.
+CT_TARGET_VENDOR="none"
+CT_BINUTILS_V_2_26=y # Specify the matching version to the Ubuntu LTS
+CT_BINUTILS_EXTRA_CONFIG_ARRAY="--disable-warn-rwx-segments"
+CT_LIBC_NEWLIB_IO_C99FMT=y
+CT_LIBC_NEWLIB_IO_LL=y
+CT_LIBC_NEWLIB_IO_FLOAT=y
+CT_LIBC_NEWLIB_DISABLE_SUPPLIED_SYSCALLS=y
+CT_GCC_V_5=y # Specify the matching version to the Ubuntu LTS
+CT_CC_GCC_MULTILIB_LIST="rmprofile aprofile"
+CT_CC_LANG_CXX=y
+CT_DEBUG_GDB=y # We want gdb
+CT_GDB_V_8_3=y # Specify the matching version to the Ubuntu LTS
+CT_GMP_V_6_1=y # Specify the matching version to the Ubuntu LTS
+CT_GMP_EXTRA_CFLAGS="-std=gnu17"
+CT_ISL_V_0_15=y # Specify the matching version to the Ubuntu LTS
+CT_COMP_LIBS_NEWLIB_NANO=y
+CT_COMP_LIBS_PICOLIBC=y
+CT_ZSTD_NEEDED=y
+```
+
+
+# Proposed plan toward the finish
+
+Here I propose an example of steps to implement all the requirements.
+Start plan mode to elaborate it.
+
+- Ensure ct-ng 1.28.0 (or 1.22.0) fulfills the each combination of versions of each LTSes.
+   - For 1.28.0, `/packages` directory contains all possible versions of all deps.
+   - For 1.22.0, `/config` directory contains *.in files that contains all possible versions.
+   - If 1.22.0 is not suitable to build older versions, report me about that, re-search other versions, and suggest the better ct-ng version.
+- Start from newer Ubuntu LTS, create config, edit it, build-and-error it, and savedefconfig it.
+   - On building ct-ng itself, configure it with `./configure --enable-local` to contain the ct-ng binary inside in the repo
+   - If any patch to ct-ng, like changing URLs, do it as needed.
+   - When building, redirect stdout to /dev/null to decrease the token use. You can check if it succeeded by reading $? and you can read the log by opening `build.log`.
+- Move the defconfig to corresponding dir and commit it.
+   - For Linux targets: `arm-unknown-linux-gnueabi(hf)?-uXXYY` (e.g. arm-unknown-linux-gnueabi-u2404)
+   - For bare-metal targets: `arm-none-eabi-uXXYY` (e.g. arm-none-eabi-u2404)
+- Compress the context of you to keep going without losing info about GH Action later on.
+- Read the existing GH Actions workflow from upstream and understand what to do to create archives.
+- Reuse or rewrite GH Actions workflow to build and upload all combinations of proposed matrix.
+   - Specify CT_PREFIX `/opt/x-tools` as the prefix on build with environment variable. Necessary on host machine.
+- Try running the workflow, watch it with gh CLI, and do try-and-error loop until the ultimate success.
+   - Try decreasing waiting time while testing builds on GH Actions. Every second matters.
+

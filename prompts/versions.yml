@@ -1,0 +1,102 @@
+# Ubuntu LTS Toolchain & Kernel Compatibility Matrix
+# Source: Research Report on GNU Toolchain Evolution (Canonical Official Data)
+# Data format: LTS_VERSION: { RELEASE_NAME, KERNEL_VERSION, GCC, GLIBC, BINUTILS, GDB, COMPANION_LIBS }
+# KERNEL_VERSION refers to the kernel used in the final point release of the LTS.
+
+toolchain_data:
+  ubuntu_12.04:
+    name: "Precise Pangolin"
+    kernel_version: "3.13" # Final point release 12.04.5 (HWE from 14.04)
+    gcc_version: "4.6.3"
+    glibc_version: "2.15" # It is EGLIBC actually. Use GLIBC if it is not available.
+    binutils_version: "2.22"
+    gdb_version: "7.4"
+    companion_libs:
+      gmp: "5.0.2"
+      mpfr: "3.1.0"
+      mpc: "0.9"
+      isl: null # Uses PPL 0.11 instead, but you won't have to take care of that, maybe
+  ubuntu_14.04:
+    name: "Trusty Tahr"
+    kernel_version: "4.4" # Final point release 14.04.6 (HWE from 16.04)
+    gcc_version: "4.8.4"
+    glibc_version: "2.19"
+    binutils_version: "2.24"
+    gdb_version: "7.7.1"
+    companion_libs:
+      gmp: "5.1.3"
+      mpfr: "3.1.2"
+      mpc: "1.0.1"
+      isl: "0.12.2"
+  ubuntu_16.04:
+    name: "Xenial Xerus"
+    kernel_version: "4.15" # Final point release 16.04.7 (HWE from 18.04)
+    gcc_version: "5.4.0"
+    glibc_version: "2.23"
+    binutils_version: "2.26.1"
+    gdb_version: "7.11.1"
+    companion_libs:
+      gmp: "6.1.0"
+      mpfr: "3.1.4"
+      mpc: "1.0.3"
+      isl: "0.15"
+  ubuntu_18.04:
+    name: "Bionic Beaver"
+    kernel_version: "5.4" # Final point release 18.04.6 (HWE from 20.04)
+    gcc_version: "7.5.0"
+    glibc_version: "2.27"
+    binutils_version: "2.30"
+    gdb_version: "8.1.1"
+    companion_libs:
+      gmp: "6.1.2"
+      mpfr: "4.0.1"
+      mpc: "1.1.0"
+      isl: "0.19"
+  ubuntu_20.04:
+    name: "Focal Fossa"
+    kernel_version: "5.15" # Final point release 20.04.6 (HWE from 22.04)
+    gcc_version: "9.4.0"
+    glibc_version: "2.31"
+    binutils_version: "2.34"
+    gdb_version: "9.2"
+    companion_libs:
+      gmp: "6.2.0"
+      mpfr: "4.0.2"
+      mpc: "1.1.0"
+      isl: "0.22.1"
+  ubuntu_22.04:
+    name: "Jammy Jellyfish"
+    kernel_version: "6.8" # Final point release 22.04.5 (HWE from 24.04)
+    gcc_version: "11.4.0"
+    glibc_version: "2.35"
+    binutils_version: "2.38"
+    gdb_version: "12.1"
+    companion_libs:
+      gmp: "6.2.1"
+      mpfr: "4.1.0"
+      mpc: "1.2.1"
+      isl: "0.24"
+  ubuntu_24.04:
+    name: "Noble Numbat"
+    kernel_version: "6.8" # Current point release 24.04.1
+    gcc_version: "13.3.0"
+    glibc_version: "2.39"
+    binutils_version: "2.42"
+    gdb_version: "15.0"
+    companion_libs:
+      gmp: "6.3.0"
+      mpfr: "4.2.1"
+      mpc: "1.3.1"
+      isl: "0.26"
+  ubuntu_26.04:
+    name: "Resolute Raccoon"
+    kernel_version: "7.0" # Official target (initially announced as 6.20)
+    gcc_version: "15.0.0"
+    glibc_version: "2.43"
+    binutils_version: "2.45"
+    gdb_version: "16.0"
+    companion_libs:
+      gmp: "6.3.0"
+      mpfr: "4.2.2"
+      mpc: "1.3.1"
+      isl: "0.27"
