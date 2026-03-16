@@ -1,0 +1,21 @@
+Remove __gnu_inline__ attribute from cfns.h to fix build with modern host compilers.
+
+The __gnu_inline__ attribute on libc_name_p conflicts with non-inline
+forward declaration when building with GCC >= 8 / C++17.
+
+diff -u a/gcc/cp/cfns.h b/gcc/cp/cfns.h
+--- a/gcc/cp/cfns.h
++++ b/gcc/cp/cfns.h
+@@ -100,12 +100,6 @@
+   return hval + asso_values[(unsigned char)str[len - 1]];
+ }
+
+-#ifdef __GNUC__
+-__inline
+-#ifdef __GNUC_STDC_INLINE__
+-__attribute__ ((__gnu_inline__))
+-#endif
+-#endif
+ const char *
+ libc_name_p (register const char *str, register unsigned int len)
+ {

@@ -329,6 +329,17 @@ do_libc_backend_once() {
     # or even after they get installed...
     echo "ac_cv_path_BASH_SHELL=/bin/bash" >>config.cache
 
+    # glibc 2.15 and older: many configure link tests fail during
+    # start_files/headers because CRT objects and libgcc don't exist yet.
+    # Pre-seed results for tests that require linking.
+    echo "libc_cv_ctors_header=yes" >>config.cache
+    echo "libc_cv_gcc_builtin_expect=yes" >>config.cache
+    echo "libc_cv_forced_unwind=yes" >>config.cache
+    echo "libc_cv_c_cleanup=yes" >>config.cache
+    echo "libc_cv_gcc_builtin_redirection=yes" >>config.cache
+    echo "libc_cv_ssp=no" >>config.cache
+    echo "libc_cv_ssp_strong=no" >>config.cache
+
     # Configure with --prefix the way we want it on the target...
     # There are a whole lot of settings here.  You'll probably want
     # to read up on what they all mean, and customize a bit, possibly by setting GLIBC_EXTRA_CONFIG_ARRAY
