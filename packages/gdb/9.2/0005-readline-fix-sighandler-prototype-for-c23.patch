@@ -1,0 +1,42 @@
+readline: fix signal handling for C23 compatibility
+
+GCC 14 defaults to -std=gnu23, where empty parentheses in function
+declarations mean "zero parameters" instead of "unspecified parameters"
+(K&R style).  This causes two build failures in readline's signal
+handling code:
+
+1. SigHandler is typedef'd with () but used with (int) — incompatible
+   types in C23.
+
+2. SIGHANDLER_RETURN expands to "return (0)" when VOID_SIGHANDLER is
+   not defined, but RETSIGTYPE is void (set by configure).  Returning
+   a value from a void function is an error in C23
+   (-Wreturn-mismatch).
+
+Fix (1) by changing the SigHandler typedef to explicitly take an int
+parameter.  Fix (2) by unconditionally defining SIGHANDLER_RETURN as
+a bare return — on all modern systems RETSIGTYPE is void anyway.
+
+diff -urN a/readline/readline/signals.c b/readline/readline/signals.c
+--- a/readline/readline/signals.c
++++ b/readline/readline/signals.c
+@@ -56,15 +56,13 @@
+ #  endif /* !VOID_SIGHANDLER */
+ #endif /* !RETSIGTYPE */
+
+-#if defined (VOID_SIGHANDLER)
+-#  define SIGHANDLER_RETURN return
+-#else
+-#  define SIGHANDLER_RETURN return (0)
+-#endif
++/* On all modern systems RETSIGTYPE is void; the old int return
++   path is incompatible with C23, so always use a bare return. */
++#define SIGHANDLER_RETURN return
+
+ /* This typedef is equivalent to the one for Function; it allows us
+    to say SigHandler *foo = signal (SIGKILL, SIG_IGN); */
+-typedef RETSIGTYPE SigHandler ();
++typedef RETSIGTYPE SigHandler (int);
+
+ #if defined (HAVE_POSIX_SIGNALS)
+ typedef struct sigaction sighandler_cxt;
