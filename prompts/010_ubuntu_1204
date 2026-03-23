@@ -1,0 +1,37 @@
+# Objective
+
+This repository (incl. branch master, 1.22.0, and 1.28.0) currently has everything necessary to build toolchains based on multiple Ubuntu versions and multiple target architectures.
+
+In the last implementation (as described in /prompts/000_implement), building toolchains for 12.04 was not successful. I guess that this is because GCC and anything related are very old. To build very toolchains, a bit older but not very old toolchains should be useful.
+
+Now it is the time to give it another try.
+
+
+# Proposed steps
+
+Currently, building a toolchain equivalent to the one, Ubuntu 14.04 had distributed, was successful. So, please do a multi-stage build to mitigate errors due to the difference of the version of the toolchain.
+
+First, check the build locally.
+
+- Build Ubuntu 14.04 (x86) toolchain to build older toolchains
+  - Host: Ubuntu 14.04 (x86_64), Target: x86_64 Linux
+  - To recreate the toolchains that Ubuntu 14.04 provided, please read /prompts/000_implement for the strategy you had in the last time
+  - If you faced any error, do your best to patch it properly, not duct-taping it
+- Compact the conversation to free the context
+- Build Ubuntu 12.04 toolchain
+  - Read /prompts/000_implement again for details and constraints of dependency
+  - Host: Ubuntu 12.04 (x86_64), Target: arm-unknown-linux-gnueabi, arm-unknown-linux,gnueabihf, arm-none-eabi (bare-metal, multilib)
+  - You will need to patch the source code. Patch it PROPERLY, not duct-taping it.
+
+If the Ubuntu 12.04's toolchain was successfully built locally, add the multi-stage build steps to the GitHub actions workflow.
+
+- Add the steps which worked locally into the GitHub Actions workflow
+  - Currently, the single flow `download-sources` -> `build-toolchains` builds everything. Since the multi-stage build needs additional native toolchain, the "build native toolchain" job and "build old toolchains" job should be separated from the original `build-toolchains` job. So, the resulting flow will fork after `download-sources` into `build-toolchains` and "build native toolchain" job.
+- Commit the workflow
+- Disable everything but the native toolchain job and old toolchains job temporarily and commit the workflow
+- Run the workflow on GitHub Actions
+- Do a build-and-error loop
+  - If you face an error, patch it PROPERLY, not duct-taping it
+- After a successful build, re-enable everything you disabled earlier
+- Do a full build
+  - The naming convention of a tag is `YYYYMMDD`. If the tag already exists, create a tag with the tomorrow's date.
