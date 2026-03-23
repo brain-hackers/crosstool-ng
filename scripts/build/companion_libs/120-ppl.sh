@@ -16,7 +16,6 @@ do_ppl_get() {
     CT_GetFile "ppl-${CT_PPL_VERSION}"                                              \
         https://support.bugseng.com/ppl/download/ftp/releases/${CT_PPL_VERSION}    \
         https://gcc.gnu.org/pub/gcc/infrastructure                                 \
-        http://bugseng.com/products/ppl/download/ftp/releases/${CT_PPL_VERSION}    \
         ftp://ftp.cs.unipr.it/pub/ppl/releases/${CT_PPL_VERSION}
 }
 
