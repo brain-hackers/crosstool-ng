@@ -1,0 +1,25 @@
+glibc: disable -z defs for libmemusage.so on ARM
+
+On ARM, __aeabi_read_tp is provided by libc.so but declared .hidden,
+so it cannot be referenced from other shared libraries at link time.
+libmemusage.so uses TLS (__thread) which generates calls to
+__aeabi_read_tp under -mtp=soft.  The symbol is resolved at runtime
+through the libc.so copy, so the undefined reference is harmless.
+
+Use the existing no-z-defs mechanism in Makerules to skip
+-Wl,-z,defs for libmemusage.so on ARM.
+
+diff -urN a/ports/sysdeps/unix/sysv/linux/arm/Makefile b/ports/sysdeps/unix/sysv/linux/arm/Makefile
+--- a/ports/sysdeps/unix/sysv/linux/arm/Makefile
++++ b/ports/sysdeps/unix/sysv/linux/arm/Makefile
+@@ -13,6 +13,10 @@
+ sysdep_routines += ioperm
+ sysdep_headers += sys/elf.h sys/io.h
+ endif
++
++ifeq ($(subdir),malloc)
++libmemusage.so-no-z-defs = yes
++endif
+
+ ifeq ($(subdir),signal)
+ sysdep_routines += sigrestorer

@@ -1,0 +1,20 @@
+ppl: fix string literal concatenation with __VERSION__ macro
+
+GCC 4.8+ with C++11 support interprets "__VERSION__ (a closing quote
+immediately followed by __VERSION__) as a user-defined literal suffix
+rather than string literal concatenation.  Add whitespace around the
+__VERSION__ macro so the preprocessor correctly concatenates the
+string literals.
+
+diff -urN a/src/version.cc b/src/version.cc
+--- a/src/version.cc
++++ b/src/version.cc
+@@ -47,7 +47,7 @@
+ #define xstr(s) str(s)
+ "Compiled by the Intel C++ compiler version "xstr(__INTEL_COMPILER)".\n"
+ #elif defined(__GNUC__)
+-"Compiled by the GNU C++ compiler version "__VERSION__".\n"
++"Compiled by the GNU C++ compiler version " __VERSION__ ".\n"
+ #else
+ "Compiled by an unknown compiler.\n"
+ #endif

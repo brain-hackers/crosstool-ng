@@ -105,6 +105,8 @@ do_debug_gdb_build() {
         CT_DoExecLog CFG                                \
         CC="${CC_for_gdb}"                              \
         LD="${LD_for_gdb}"                              \
+        CFLAGS="-I${CT_HOST_COMPLIBS_DIR}/include"      \
+        LDFLAGS="-L${CT_HOST_COMPLIBS_DIR}/lib"         \
         "${gdb_src_dir}/configure"                      \
             --build=${CT_BUILD}                         \
             --host=${CT_HOST}                           \
