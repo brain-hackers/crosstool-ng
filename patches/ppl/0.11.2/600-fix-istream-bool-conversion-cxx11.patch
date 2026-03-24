@@ -1,0 +1,18 @@
+From: Claude <noreply@anthropic.com>
+Subject: Fix implicit istream-to-bool conversion for C++11 and later
+
+Since C++11, std::basic_istream::operator bool() is explicit, so
+`return s;` in a bool-returning function no longer compiles.
+Use `!s.fail()` for an equivalent explicit check.
+
+--- a/src/Interval_Info.inlines.hh
++++ b/src/Interval_Info.inlines.hh
+@@ -87,7 +87,7 @@
+   std::ios_base::fmtflags old = s.flags();
+   if (s >> std::hex >> bitset) {
+     s.flags(old);
+-    return s;
++    return !s.fail();
+   }
+   else
+     return false;

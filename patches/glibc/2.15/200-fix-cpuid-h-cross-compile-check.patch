@@ -1,0 +1,23 @@
+From: Claude <noreply@anthropic.com>
+Subject: Fix cpuid.h cross-compilation check for x86 targets
+
+When cross-compiling glibc for x86, the cpuid.h header check uses
+ac_fn_c_check_header_mongrel which includes <stdio.h> in the test
+program. Since glibc itself provides <stdio.h>, it is not yet available
+during the start-files stage of cross-compilation, causing the check
+to falsely fail.
+
+Switch to ac_fn_c_check_header_compile with an empty includes list,
+since cpuid.h is a standalone GCC internal header with no dependencies.
+
+--- a/sysdeps/i386/configure
++++ b/sysdeps/i386/configure
+@@ -632,7 +632,7 @@
+ done
+
+
+-ac_fn_c_check_header_mongrel "$LINENO" "cpuid.h" "ac_cv_header_cpuid_h" "$ac_includes_default"
++ac_fn_c_check_header_compile "$LINENO" "cpuid.h" "ac_cv_header_cpuid_h" ""
+ if test "x$ac_cv_header_cpuid_h" = xyes; then :
+
+ else
