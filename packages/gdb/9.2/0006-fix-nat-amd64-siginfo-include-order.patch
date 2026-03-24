@@ -1,0 +1,24 @@
+From: Claude <noreply@anthropic.com>
+Subject: Fix include order in nat/amd64-linux-siginfo.c for gnulib
+
+When building native GDB for x86_64 targets, gnulib's replacement
+unistd.h is on the include path and requires config.h to be included
+first. The file nat/amd64-linux-siginfo.c includes <signal.h> before
+gdbsupport/common-defs.h, and since signal.h transitively includes
+unistd.h, the gnulib header fires its #error guard.
+
+Move the gdbsupport/common-defs.h include (which pulls in config.h)
+before <signal.h> to satisfy the gnulib requirement.
+
+--- a/gdb/nat/amd64-linux-siginfo.c
++++ b/gdb/nat/amd64-linux-siginfo.c
+@@ -17,8 +17,8 @@
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+
+-#include <signal.h>
+ #include "gdbsupport/common-defs.h"
++#include <signal.h>
+ #include "amd64-linux-siginfo.h"
+
+ #define GDB_SI_SIZE 128
