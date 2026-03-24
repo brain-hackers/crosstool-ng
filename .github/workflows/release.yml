@@ -60,24 +60,30 @@ jobs:
               arm-unknown-linux-gnueabi-u2404
               arm-unknown-linux-gnueabihf-u2404
               arm-none-eabi-u2404
+              x86_64-unknown-linux-gnu-u2404
               arm-unknown-linux-gnueabi-u2204
               arm-unknown-linux-gnueabihf-u2204
               arm-none-eabi-u2204
+              x86_64-unknown-linux-gnu-u2204
               arm-unknown-linux-gnueabi-u2004
               arm-unknown-linux-gnueabihf-u2004
               arm-none-eabi-u2004
+              x86_64-unknown-linux-gnu-u2004
               arm-unknown-linux-gnueabi-u1804
               arm-unknown-linux-gnueabihf-u1804
               arm-none-eabi-u1804
+              x86_64-unknown-linux-gnu-u1804
               arm-unknown-linux-gnueabi-u1604
               arm-unknown-linux-gnueabihf-u1604
               arm-none-eabi-u1604
+              x86_64-unknown-linux-gnu-u1604
           - branch: "1.22.0"
             samples: >-
               x86_64-unknown-linux-gnu-u1404
               arm-unknown-linux-gnueabi-u1404
               arm-unknown-linux-gnueabihf-u1404
               arm-none-eabi-u1404
+              x86_64-unknown-linux-gnu-u1204
               arm-unknown-linux-gnueabi-u1204
               arm-unknown-linux-gnueabihf-u1204
               arm-none-eabi-u1204
@@ -127,26 +133,32 @@ jobs:
           - {sample: "arm-unknown-linux-gnueabi-u2404", branch: "1.28.0"}
           - {sample: "arm-unknown-linux-gnueabihf-u2404", branch: "1.28.0"}
           - {sample: "arm-none-eabi-u2404", branch: "1.28.0"}
+          - {sample: "x86_64-unknown-linux-gnu-u2404", branch: "1.28.0"}
           # 1.28.0 — Ubuntu 22.04
           - {sample: "arm-unknown-linux-gnueabi-u2204", branch: "1.28.0"}
           - {sample: "arm-unknown-linux-gnueabihf-u2204", branch: "1.28.0"}
           - {sample: "arm-none-eabi-u2204", branch: "1.28.0"}
+          - {sample: "x86_64-unknown-linux-gnu-u2204", branch: "1.28.0"}
           # 1.28.0 — Ubuntu 20.04
           - {sample: "arm-unknown-linux-gnueabi-u2004", branch: "1.28.0"}
           - {sample: "arm-unknown-linux-gnueabihf-u2004", branch: "1.28.0"}
           - {sample: "arm-none-eabi-u2004", branch: "1.28.0"}
+          - {sample: "x86_64-unknown-linux-gnu-u2004", branch: "1.28.0"}
           # 1.28.0 — Ubuntu 18.04
           - {sample: "arm-unknown-linux-gnueabi-u1804", branch: "1.28.0"}
           - {sample: "arm-unknown-linux-gnueabihf-u1804", branch: "1.28.0"}
           - {sample: "arm-none-eabi-u1804", branch: "1.28.0"}
+          - {sample: "x86_64-unknown-linux-gnu-u1804", branch: "1.28.0"}
           # 1.28.0 — Ubuntu 16.04
           - {sample: "arm-unknown-linux-gnueabi-u1604", branch: "1.28.0"}
           - {sample: "arm-unknown-linux-gnueabihf-u1604", branch: "1.28.0"}
           - {sample: "arm-none-eabi-u1604", branch: "1.28.0"}
+          - {sample: "x86_64-unknown-linux-gnu-u1604", branch: "1.28.0"}
           # 1.22.0 — Ubuntu 14.04
           - {sample: "arm-unknown-linux-gnueabi-u1404", branch: "1.22.0"}
           - {sample: "arm-unknown-linux-gnueabihf-u1404", branch: "1.22.0"}
           - {sample: "arm-none-eabi-u1404", branch: "1.22.0"}
+          - {sample: "x86_64-unknown-linux-gnu-u1404", branch: "1.22.0"}
     steps:
       - name: Free disk space
         run: |
@@ -286,6 +298,7 @@ jobs:
           - {sample: "arm-unknown-linux-gnueabi-u1204", branch: "1.22.0"}
           - {sample: "arm-unknown-linux-gnueabihf-u1204", branch: "1.22.0"}
           - {sample: "arm-none-eabi-u1204", branch: "1.22.0"}
+          - {sample: "x86_64-unknown-linux-gnu-u1204", branch: "1.22.0"}
     steps:
       - name: Free disk space
         run: |
